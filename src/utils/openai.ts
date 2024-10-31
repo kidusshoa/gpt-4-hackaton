@@ -26,19 +26,19 @@ interface OpenAIResponse {
   }>;
 }
 
-// Function to query GPT-4o
-export const queryGPT4o = async (
-  payload: OpenAIRequestPayload
-): Promise<string> => {
+export async function queryGPT4o({
+  inputs,
+  parameters,
+}: OpenAIRequestPayload): Promise<string> {
   try {
     const response = await axios.post<OpenAIResponse>(
       OPENAI_API_URL,
       {
-        model: "gpt-4o", // Specify the model (if required, e.g., GPT-4o)
-        prompt: payload.inputs,
-        max_tokens: payload.parameters?.max_new_tokens || 100,
-        temperature: payload.parameters?.temperature || 0.7,
-        top_p: payload.parameters?.top_p || 1.0,
+        model: "text-davinci-004", // Replace with appropriate model name if different
+        prompt: inputs,
+        max_tokens: parameters?.max_new_tokens || 100,
+        temperature: parameters?.temperature || 0.5,
+        top_p: parameters?.top_p || 1.0,
       },
       {
         headers: {
@@ -48,11 +48,12 @@ export const queryGPT4o = async (
       }
     );
 
-    // Extract and return the text from the first completion choice
-    const outputText = response.data.choices[0]?.text.trim();
-    return outputText || "No output from the model.";
-  } catch (error) {
-    console.error("Error querying GPT-4o:", error);
-    throw new Error("Failed to fetch data from GPT-4o");
+    return response.data.choices[0]?.text.trim() || "No recipe generated.";
+  } catch (error: any) {
+    console.error(
+      "Error querying GPT-4o:",
+      error.response?.data || error.message
+    );
+    throw new Error("Failed to query GPT-4o.");
   }
-};
+}
