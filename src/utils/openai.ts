@@ -34,7 +34,7 @@ export async function queryGPT4o({
     const response = await axios.post<OpenAIResponse>(
       OPENAI_API_URL,
       {
-        model: "text-davinci-004", // Replace with appropriate model name if different
+        model: "GPT-4o",
         prompt: inputs,
         max_tokens: parameters?.max_new_tokens || 100,
         temperature: parameters?.temperature || 0.5,

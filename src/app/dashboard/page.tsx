@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../../config/firebase";
+import { toast } from "react-toastify";
 
 const Dashboard = () => {
   const [ingredients, setIngredients] = useState("");
@@ -28,7 +29,7 @@ const Dashboard = () => {
   const handleGenerateRecipes = async () => {
     try {
       setLoading(true);
-      setRecipes(null); // Reset recipes when generating new ones
+      setRecipes(null);
 
       const response = await fetch("/api/generate-recipes", {
         method: "POST",
@@ -43,16 +44,16 @@ const Dashboard = () => {
       });
 
       const data = await response.json();
-      console.log(data); // Log the response for debugging
+      console.log(data);
 
       if (response.ok && data.success) {
-        setRecipes(data.recipes); // Set the recipes returned from the API
+        setRecipes(data.recipes);
       } else {
         throw new Error(data.message || "Failed to generate recipes");
       }
     } catch (error: any) {
       console.error(error.message);
-      // Handle error (e.g., show toast notification)
+      toast("generating recipe failed");
     } finally {
       setLoading(false);
     }
@@ -66,7 +67,8 @@ const Dashboard = () => {
       console.error(error);
     }
   };
-  console.log("API Key present:", !!process.env.OPENAI_API_KEY); // This should print true
+  const apiKey = process.env.OPENAI_API_KEY;
+  console.log("OpenAI API Key:", apiKey ? "Loaded" : "Not Loaded");
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -110,7 +112,7 @@ const Dashboard = () => {
                 Enter your ingredients (one per line)
               </label>
               <textarea
-                className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full h-32 px-3 py-2 text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="e.g.&#10;2 chicken breasts&#10;1 cup rice&#10;carrots"
                 value={ingredients}
                 onChange={(e) => setIngredients(e.target.value)}
@@ -186,7 +188,6 @@ const Dashboard = () => {
               )}
             </button>
 
-            {/* Display AI-generated recipes */}
             {recipes && (
               <div className="mt-6 bg-gray-50 p-4 rounded-lg">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
