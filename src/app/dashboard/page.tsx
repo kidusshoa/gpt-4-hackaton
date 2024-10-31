@@ -67,7 +67,7 @@ const Dashboard = () => {
       console.error(error);
     }
   };
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
   console.log("OpenAI API Key:", apiKey ? "Loaded" : "Not Loaded");
 
   return (

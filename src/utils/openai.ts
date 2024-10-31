@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_API_URL = "https://api.openai.com/v1/completions";
+const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
 if (!OPENAI_API_KEY) {
   throw new Error(
@@ -22,7 +22,9 @@ interface OpenAIRequestPayload {
 
 interface OpenAIResponse {
   choices: Array<{
-    text: string;
+    message: {
+      content: string;
+    };
   }>;
 }
 
@@ -35,7 +37,7 @@ export async function queryGPT4o({
       OPENAI_API_URL,
       {
         model: "GPT-4o",
-        prompt: inputs,
+        messages: [{ role: "user", content: inputs }],
         max_tokens: parameters?.max_new_tokens || 100,
         temperature: parameters?.temperature || 0.5,
         top_p: parameters?.top_p || 1.0,
@@ -48,7 +50,9 @@ export async function queryGPT4o({
       }
     );
 
-    return response.data.choices[0]?.text.trim() || "No recipe generated.";
+    return (
+      response.data.choices[0]?.message.content.trim() || "No recipe generated."
+    );
   } catch (error: any) {
     console.error(
       "Error querying GPT-4o:",
